@@ -1,3 +1,2 @@
-python3-distutils
-rustc
-cargo
+python3-dev
+build-essential
