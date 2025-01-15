@@ -96,7 +96,8 @@ class ChatInterface:
                 st.session_state.rag_system = CrustDataRAG(api_key=api_key)
                 self.load_documents()
                 st.success("API key successfully set! You can now use the chat interface.")
-                st.rerun()
+                st.experimental_rerun()
+
             else:
                 st.error("Please enter a valid API key.")
 
@@ -210,7 +211,8 @@ class ChatInterface:
                     "timestamp": datetime.now().isoformat()
                 })
             
-            st.rerun()
+            st.experimental_rerun()
+
 
     def display_chat_history(self):
         """Display chat history with enhanced formatting."""
@@ -271,5 +273,4 @@ class ChatInterface:
 if __name__ == "__main__":
     chat_app = ChatInterface()
     chat_app.main()
-
 
