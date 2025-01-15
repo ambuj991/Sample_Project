@@ -1,5 +1,5 @@
 import os
-from openai import OpenAI
+import openai  
 import numpy as np
 import tiktoken
 from typing import List, Tuple
@@ -10,7 +10,7 @@ from pathlib import Path
 class CrustDataRAG:
     def __init__(self, api_key: str, model: str = "gpt-3.5-turbo", cache_dir: str = "cache"):
         """Initialize the RAG system with OpenAI credentials and caching."""
-        self.client = OpenAI(api_key=api_key)
+        openai.api_key = api_key  # Set the API key directly in the openai library
         self.model = model
         self.documents = []
         self.embeddings_cache = []
@@ -64,19 +64,19 @@ class CrustDataRAG:
         
         for i in range(0, len(self.documents), batch_size):
             batch = self.documents[i:i + batch_size]
-            response = self.client.embeddings.create(
+            response = openai.Embedding.create(  # Correct method for embeddings
                 model="text-embedding-3-small",
                 input=batch
             )
-            self.embeddings_cache.extend([data.embedding for data in response.data])
+            self.embeddings_cache.extend([data['embedding'] for data in response['data']])
 
     def search(self, query: str, top_k: int = 3) -> List[Tuple[str, float]]:
         """Enhanced semantic search with better relevance scoring."""
-        query_response = self.client.embeddings.create(
+        query_response = openai.Embedding.create(  # Correct method for embeddings
             model="text-embedding-3-small",
             input=query
         )
-        query_embedding = query_response.data[0].embedding
+        query_embedding = query_response['data'][0]['embedding']
         
         similarities = cosine_similarity(
             [query_embedding],
@@ -110,11 +110,11 @@ class CrustDataRAG:
             "content": f"Question about CrustData API: {query}\n\nRelevant documentation:\n{context}"
         })
         
-        response = self.client.chat.completions.create(
+        response = openai.ChatCompletion.create(  # Correct method for chat completions
             model=self.model,
             messages=messages,
             temperature=0.7,
             max_tokens=500
         )
         
-        return response.choices[0].message.content
+        return response['choices'][0]['message']['content']
